@@ -31,7 +31,7 @@
     "eslint": "^8.5.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.22.1",
-    "file-type": "^16.2.0",
+    "file-type": "^18.1.0",
     "release-it": "^15.0.0"
   }
 }
