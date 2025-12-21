@@ -15,15 +15,13 @@ let cluster;
  * PDF rendering is extremely resource-intensive if we do not reuse browser instances
  * On a RPi V4, we have a 17 second startup by launching a new browser each time.  By
  * reusing the same chromium instance, we shave that to sub-second timing.
- *
  * @param {Object} customizedPuppeteerOptions - options to pass to puppeteer on launch
- *  the @param customizedPuppeteerOptions may have as value:
- *  { 
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
-    };
+ * @param {Object} customizedPuppeteerOptions may have as value:
+ * { 
+ *    headless: 'new',
+ *    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
+ * };
  */
-
 
 const launch = async (customizedPuppeteerOptions = {}) => {
   debug('#launch(): setting up puppeteer cluster');
@@ -33,7 +31,7 @@ const launch = async (customizedPuppeteerOptions = {}) => {
     maxConcurrency : 2,
   };
 
-  const puppeteerOptions = Object.assign({ headless: 'new' }, customizedPuppeteerOptions);
+  const puppeteerOptions = { headless: 'new', ...customizedPuppeteerOptions };
 
   if (process.env.CHROME_OPTIONS) {
     Object.assign(puppeteerOptions, {
@@ -91,23 +89,20 @@ const launch = async (customizedPuppeteerOptions = {}) => {
 
 /**
  * @function render
- *
  * @description
  * Takes an HTML source file, inlines the assets, spins up a new puppeteer instance, and
  * renders them together into a PDF.
  *
  * @param {String} html - the html template
  * @param {Object} options - options to merge into the HTML
- *
  * @returns {Promise} a PDF of the HTML source
-
-
- *  the @param customizedPuppeteerOptions may have as value:
- *  { 
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
-    };
+ * @param {Object} customizedPuppeteerOptions may have as value:
+ * {
+ *    headless: 'new',
+ *    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
+ * };
  */
+
 async function render(html, options = {}, customizedPuppeteerOptions = {}) {
   const opts = { ...options, ...DEFAULTS };
 
