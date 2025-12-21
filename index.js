@@ -15,8 +15,17 @@ let cluster;
  * PDF rendering is extremely resource-intensive if we do not reuse browser instances
  * On a RPi V4, we have a 17 second startup by launching a new browser each time.  By
  * reusing the same chromium instance, we shave that to sub-second timing.
+ *
+ * @param {Object} customizedPuppeteerOptions - options to pass to puppeteer on launch
+ *  the @param customizedPuppeteerOptions may have as value:
+ *  { 
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
+    };
  */
-const launch = async () => {
+
+
+const launch = async (customizedPuppeteerOptions = {}) => {
   debug('#launch(): setting up puppeteer cluster');
 
   const options = {
@@ -24,7 +33,7 @@ const launch = async () => {
     maxConcurrency : 2,
   };
 
-  const puppeteerOptions = { headless: 'new' };
+  const puppeteerOptions = Object.assign({ headless: 'new' }, customizedPuppeteerOptions);
 
   if (process.env.CHROME_OPTIONS) {
     Object.assign(puppeteerOptions, {
@@ -91,8 +100,15 @@ const launch = async () => {
  * @param {Object} options - options to merge into the HTML
  *
  * @returns {Promise} a PDF of the HTML source
+
+
+ *  the @param customizedPuppeteerOptions may have as value:
+ *  { 
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
+    };
  */
-async function render(html, options = {}) {
+async function render(html, options = {}, customizedPuppeteerOptions = {}) {
   const opts = { ...options, ...DEFAULTS };
 
   let inlined = html;
@@ -103,7 +119,7 @@ async function render(html, options = {}) {
     });
   }
 
-  if (!cluster) { cluster = await launch(); }
+  if (!cluster) { cluster = await launch(customizedPuppeteerOptions); }
 
   // make sure cluster is setup
   const pdf = await cluster.execute({ options : opts, html : inlined });
